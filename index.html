@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Superhero TTRPG Character Sheet</title>
+  <style>
+    :root {
+      --ink: #050505;
+      --paper: #fffdf8;
+      --red: #d91e2d;
+      --dark-red: #9f111b;
+      --blue: #0064ad;
+      --navy: #101b4c;
+      --yellow: #ffd522;
+      --pale: #eef7fb;
+      --line: #d6e0e8;
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18px 18px, rgba(0,0,0,.12) 1px, transparent 1.7px) 0 0 / 12px 12px,
+        linear-gradient(135deg, #edf7ff, #fff);
+    }
+    button, input, textarea, select { font: inherit; }
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      padding: 12px;
+      background: rgba(255,255,255,.95);
+      border-bottom: 4px solid var(--ink);
+    }
+    .toolbar button, .toolbar label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 8px 13px;
+      border: 3px solid var(--ink);
+      background: var(--yellow);
+      color: var(--ink);
+      box-shadow: 3px 3px 0 var(--ink);
+      cursor: pointer;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+    .toolbar input, .hidden-file {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .page {
+      width: min(1260px, 100%);
+      margin: 0 auto;
+      padding: 24px 16px 44px;
+    }
+    .sheet {
+      position: relative;
+      overflow: hidden;
+      min-height: 1450px;
+      padding: 28px;
+      border: 6px solid var(--ink);
+      background:
+        linear-gradient(130deg, transparent 0 15%, var(--red) 15% 21%, transparent 21% 51%, var(--yellow) 51% 58%, transparent 58%),
+        linear-gradient(60deg, var(--blue) 0 10%, transparent 10% 74%, var(--red) 74% 86%, var(--yellow) 86%),
+        var(--paper);
+      box-shadow: 0 24px 34px rgba(0,0,0,.25);
+      isolation: isolate;
+    }
+    .sheet::before {
+      content: "";
+      position: absolute;
+      inset: -18%;
+      z-index: -1;
+      background:
+        repeating-conic-gradient(from 0deg at 61% 34%, rgba(0,0,0,.24) 0 1deg, transparent 1deg 8deg),
+        repeating-radial-gradient(circle at 38% 45%, rgba(0,0,0,.12) 0 2px, transparent 2px 12px);
+      opacity: .23;
+    }
+    .stripe {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin: -28px -28px 18px;
+      padding: 8px 28px;
+      border-bottom: 5px solid var(--ink);
+      background: repeating-linear-gradient(135deg, white 0 10px, var(--red) 10px 17px);
+      color: white;
+      text-shadow: 2px 2px 0 var(--ink);
+      text-transform: uppercase;
+      font-size: clamp(1rem, 2vw, 1.5rem);
+    }
+    .stripe span {
+      padding: 4px 10px;
+      border: 3px solid white;
+      background: var(--red);
+    }
+    .top {
+      display: grid;
+      grid-template-columns: 300px 1fr 220px;
+      gap: 18px;
+      margin-bottom: 18px;
+      align-items: stretch;
+    }
+    .photo, .panel, .field, .rank-card, .hero-art, .ability, .damage, .power-card {
+      border: 5px solid var(--ink);
+      background: rgba(255,255,255,.94);
+      box-shadow: 5px 5px 0 var(--ink);
+    }
+    .photo, .hero-art {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 320px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .photo img, .hero-art img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    .photo.has-image img, .hero-art.has-image img { display: block; }
+    .photo.has-image .drop, .hero-art.has-image .drop { display: none; }
+    .drop {
+      width: min(230px, 90%);
+      color: white;
+      text-align: center;
+      text-transform: uppercase;
+      text-shadow: 3px 3px 0 var(--ink), -1px -1px 0 var(--ink), 1px -1px 0 var(--ink), -1px 1px 0 var(--ink);
+      line-height: .95;
+      transform: skew(-8deg);
+      font-size: clamp(1.3rem, 3vw, 2rem);
+    }
+    .identity {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+    .badge {
+      justify-self: center;
+      width: min(360px, 100%);
+      min-height: 132px;
+      display: grid;
+      place-items: center;
+      border: 5px solid var(--ink);
+      background:
+        linear-gradient(90deg, var(--red) 0 27%, white 27% 32%, var(--navy) 32% 52%, var(--yellow) 52% 58%, var(--blue) 58%);
+      clip-path: polygon(50% 0, 92% 20%, 84% 74%, 50% 100%, 16% 74%, 8% 20%);
+      color: white;
+      text-align: center;
+      text-shadow: 3px 3px 0 var(--ink);
+      font-size: clamp(1.2rem, 3vw, 2rem);
+    }
+    h1 {
+      margin: 0;
+      color: white;
+      text-align: center;
+      text-transform: uppercase;
+      text-shadow: 4px 4px 0 var(--ink), -2px -2px 0 var(--ink), 2px -2px 0 var(--ink), -2px 2px 0 var(--ink);
+      transform: skew(-7deg);
+      line-height: .9;
+      font-size: clamp(2.2rem, 5vw, 4.4rem);
+    }
+    .rank-stack { display: grid; gap: 12px; }
+    .rank-card {
+      min-height: 86px;
+      padding: 8px;
+      text-align: center;
+      border-color: var(--red);
+      background: linear-gradient(135deg, white 0 72%, #fae9e9 72%);
+    }
+    .rank-card label {
+      display: block;
+      color: var(--navy);
+      text-transform: uppercase;
+      font-size: 1rem;
+      text-shadow: none;
+    }
+    .rank-card input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--ink);
+      text-align: center;
+      font-size: clamp(1.7rem, 4vw, 2.7rem);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: .92fr 1.08fr;
+      gap: 18px;
+    }
+    .left, .right { display: flex; flex-direction: column; gap: 14px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .field {
+      display: grid;
+      gap: 5px;
+      min-height: 70px;
+      padding: 9px 13px 11px;
+      transform: skew(-3deg);
+    }
+    label, .panel-title {
+      display: block;
+      color: white;
+      text-transform: uppercase;
+      text-shadow: 3px 3px 0 var(--ink), -1px -1px 0 var(--ink), 1px -1px 0 var(--ink), -1px 1px 0 var(--ink);
+      font-size: clamp(1rem, 2vw, 1.55rem);
+      line-height: .9;
+    }
+    input[type="text"], input[type="number"], textarea, select {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--navy);
+      font-family: "Arial Narrow", Arial, sans-serif;
+      font-weight: 900;
+      font-size: 1.08rem;
+      resize: vertical;
+    }
+    textarea { min-height: 115px; line-height: 1.25; }
+    .panel { padding: 12px; }
+    .red-panel { border-color: var(--red); }
+    .abilities {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 9px;
+      margin-top: 10px;
+    }
+    .ability {
+      display: grid;
+      grid-template-columns: 1fr 82px;
+      min-height: 62px;
+      overflow: hidden;
+      border-color: var(--red);
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+    .ability label {
+      display: grid;
+      place-items: center start;
+      padding: 8px;
+      background: var(--red);
+      font-size: 1rem;
+    }
+    .ability input {
+      border: 0;
+      background: white;
+      color: var(--ink);
+      text-align: center;
+      font-size: 1.55rem;
+    }
+    .stat-controls {
+      display: grid;
+      gap: 10px;
+      font-family: "Arial Narrow", Arial, sans-serif;
+      font-weight: 900;
+    }
+    .statistics-grid {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) 1fr;
+      gap: 14px;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .radar {
+      width: 100%;
+      min-width: 220px;
+      aspect-ratio: 1;
+    }
+    .stat-line {
+      display: grid;
+      grid-template-columns: 110px 1fr 34px;
+      gap: 8px;
+      align-items: center;
+    }
+    .stat-line b {
+      color: white;
+      text-transform: uppercase;
+      text-shadow: 2px 2px 0 var(--ink), -1px -1px 0 var(--ink), 1px -1px 0 var(--ink), -1px 1px 0 var(--ink);
+    }
+    input[type="range"] { width: 100%; accent-color: var(--red); }
+    .damage-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 9px;
+      margin-top: 10px;
+    }
+    .health-controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      margin-top: 10px;
+    }
+    .health-control {
+      min-height: 82px;
+      padding: 8px;
+      border: 4px solid var(--ink);
+      background: rgba(255,255,255,.96);
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+    .health-control label {
+      color: var(--navy);
+      text-shadow: none;
+      font-size: .95rem;
+    }
+    .health-control input {
+      margin-top: 6px;
+      border: 3px solid var(--ink);
+      background: white;
+      color: var(--ink);
+      text-align: center;
+      font-size: 1.25rem;
+    }
+    .damage {
+      min-height: 96px;
+      padding: 8px;
+      border-color: var(--dark-red);
+      background: var(--red);
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+    .damage label { font-size: .95rem; }
+    .damage input {
+      margin-top: 6px;
+      border: 3px solid var(--ink);
+      background: white;
+      color: var(--ink);
+      text-align: center;
+      font-size: 1.4rem;
+    }
+    .tracker {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      margin-top: 10px;
+    }
+    .tracker button, .dice-row button {
+      border: 3px solid var(--ink);
+      box-shadow: 3px 3px 0 var(--ink);
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+    .tracker button { min-height: 42px; background: var(--yellow); }
+    .meter {
+      height: 22px;
+      margin-top: 10px;
+      border: 3px solid var(--ink);
+      background: white;
+      overflow: hidden;
+    }
+    .meter span {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--red), var(--yellow));
+    }
+    .hero-art {
+      min-height: 620px;
+      background:
+        repeating-radial-gradient(circle at center, transparent 0 36px, rgba(17,28,79,.16) 37px 38px),
+        linear-gradient(180deg, rgba(255,255,255,.98), rgba(237,246,251,.93));
+    }
+    .hero-art::after {
+      content: "FULL-BODY HERO ILLUSTRATION AREA";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 9px 14px;
+      border-top: 5px solid var(--ink);
+      background: rgba(255,255,255,.86);
+      color: white;
+      text-shadow: 3px 3px 0 var(--ink), -1px -1px 0 var(--ink), 1px -1px 0 var(--ink), -1px 1px 0 var(--ink);
+      font-size: clamp(1rem, 2vw, 1.55rem);
+    }
+    .bio-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 9px;
+    }
+    .bio-grid .field {
+      min-height: 60px;
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+    .tall { min-height: 215px; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .power-card {
+      position: relative;
+      min-height: 248px;
+      padding: 48px 10px 10px;
+      border-color: var(--navy);
+      border-radius: 10px;
+      background:
+        linear-gradient(135deg, transparent 0 67%, var(--yellow) 67% 72%, var(--blue) 72% 78%, var(--red) 78% 84%, transparent 84%),
+        white;
+    }
+    .power-card::before {
+      content: attr(data-icon);
+      position: absolute;
+      top: -31px;
+      left: 50%;
+      width: 76px;
+      height: 76px;
+      display: grid;
+      place-items: center;
+      transform: translateX(-50%);
+      border: 5px solid var(--navy);
+      border-radius: 50%;
+      background: white;
+      color: var(--navy);
+      box-shadow: 0 0 0 5px var(--red), 4px 4px 0 var(--ink);
+      font-size: 2rem;
+    }
+    .power-card input, .power-card textarea {
+      border: 3px solid var(--line);
+      background: var(--pale);
+      padding: 6px;
+      font-size: 1rem;
+    }
+    .power-card textarea { min-height: 76px; }
+    .dice-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .dice-row button {
+      width: 54px;
+      min-height: 40px;
+      background: var(--red);
+      color: white;
+    }
+    .dice-result {
+      min-width: 104px;
+      padding: 7px 10px;
+      border: 3px solid var(--ink);
+      background: var(--yellow);
+      text-align: center;
+    }
+    @media (max-width: 980px) {
+      .top, .grid { grid-template-columns: 1fr; }
+      .photo { width: min(340px, 100%); margin: 0 auto; }
+      .rank-stack { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 700px) {
+      .sheet { padding: 18px; }
+      .stripe { margin: -18px -18px 14px; padding-inline: 18px; }
+      .row, .abilities, .damage-grid, .health-controls, .bio-grid, .cards, .rank-stack, .statistics-grid { grid-template-columns: 1fr; }
+      .hero-art { min-height: 500px; }
+      .stat-line { grid-template-columns: 90px 1fr 30px; }
+    }
+    @media print {
+      body { background: white; }
+      .toolbar { display: none; }
+      .page { width: 100%; padding: 0; }
+      .sheet { box-shadow: none; border-width: 4px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="toolbar" aria-label="Sheet tools">
+    <button id="saveBtn" type="button">Save</button>
+    <button id="loadBtn" type="button">Load</button>
+    <button id="clearBtn" type="button">Clear</button>
+    <button id="exportBtn" type="button">Export</button>
+    <label>Import<input id="importFile" type="file" accept="application/json"></label>
+    <button id="printBtn" type="button">Print</button>
+  </nav>
+
+  <main class="page">
+    <section class="sheet">
+      <div class="stripe"><span>/8/ Characters</span><span>Hero Academy Dossier</span></div>
+      <header class="top">
+        <label class="photo" for="portraitInput">
+          <img id="portraitPreview" alt="">
+          <span class="drop">Profile<br>Photo</span>
+        </label>
+        <div class="identity">
+          <div class="badge">Northern Academy<br>Superhero Program</div>
+          <h1>Hero Course File</h1>
+          <div class="field"><label for="characterName">Character Name</label><input id="characterName" data-save="characterName" type="text"></div>
+          <div class="field"><label for="heroName">Hero Name</label><input id="heroName" data-save="heroName" type="text"></div>
+        </div>
+        <div class="rank-stack">
+          <div class="rank-card"><label for="rank">Rank</label><input id="rank" data-save="rank" type="number" min="1" max="20" value="1"></div>
+          <div class="rank-card"><label for="karma">Karma</label><input id="karma" data-save="karma" type="number" min="0" value="0"></div>
+          <div class="rank-card"><label for="health">Health</label><input id="health" data-save="health" type="number" min="0" value="100"></div>
+        </div>
+      </header>
+
+      <div class="grid">
+        <section class="left">
+          <div class="row">
+            <div class="field"><label for="age">Age</label><input id="age" data-save="age" type="number" min="1"></div>
+            <div class="field"><label for="height">Height</label><input id="height" data-save="height" type="text"></div>
+          </div>
+          <div class="row">
+            <div class="field"><label for="gender">Gender</label><input id="gender" data-save="gender" type="text"></div>
+            <div class="field"><label for="origin">Origin</label><input id="origin" data-save="origin" type="text"></div>
+          </div>
+          <div class="field"><label for="quirk">Power / Quirk</label><input id="quirk" data-save="quirk" type="text"></div>
+
+          <div class="panel red-panel">
+            <span class="panel-title">Abilities</span>
+            <div class="abilities">
+              <div class="ability"><label for="melee">Melee</label><input id="melee" data-save="melee" type="number" value="0"></div>
+              <div class="ability"><label for="agility">Agility</label><input id="agility" data-save="agility" type="number" value="0"></div>
+              <div class="ability"><label for="resilience">Resilience</label><input id="resilience" data-save="resilience" type="number" value="0"></div>
+              <div class="ability"><label for="vigilance">Vigilance</label><input id="vigilance" data-save="vigilance" type="number" value="0"></div>
+              <div class="ability"><label for="ego">Ego</label><input id="ego" data-save="ego" type="number" value="0"></div>
+              <div class="ability"><label for="logic">Logic</label><input id="logic" data-save="logic" type="number" value="0"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <span class="panel-title">Statistics</span>
+            <div class="statistics-grid">
+              <svg class="radar" viewBox="0 0 240 240" role="img" aria-label="Hero statistics radar chart">
+                <g fill="none" stroke="#9fb4c8" stroke-width="1.5">
+                  <polygon points="120,24 211,90 176,198 64,198 29,90"></polygon>
+                  <polygon points="120,48 188,98 162,178 78,178 52,98"></polygon>
+                  <polygon points="120,72 166,106 148,158 92,158 74,106"></polygon>
+                  <polygon points="120,96 143,113 134,139 106,139 97,113"></polygon>
+                  <line x1="120" y1="120" x2="120" y2="24"></line>
+                  <line x1="120" y1="120" x2="211" y2="90"></line>
+                  <line x1="120" y1="120" x2="176" y2="198"></line>
+                  <line x1="120" y1="120" x2="64" y2="198"></line>
+                  <line x1="120" y1="120" x2="29" y2="90"></line>
+                </g>
+                <polygon id="radarShape" points="" fill="rgba(0,100,173,.28)" stroke="#0064ad" stroke-width="4"></polygon>
+                <g font-family="Impact, Arial Black, sans-serif" font-size="14" fill="#050505" text-anchor="middle">
+                  <text x="120" y="16">Power</text>
+                  <text x="224" y="91">Speed</text>
+                  <text x="179" y="222">Intelligence</text>
+                  <text x="61" y="222">Technique</text>
+                  <text x="18" y="91">Shield</text>
+                </g>
+              </svg>
+              <div class="stat-controls">
+                <div class="stat-line"><b>Power</b><input data-stat="power" data-save="power" type="range" min="0" max="10" value="5"><span>5</span></div>
+                <div class="stat-line"><b>Speed</b><input data-stat="speed" data-save="speed" type="range" min="0" max="10" value="5"><span>5</span></div>
+                <div class="stat-line"><b>Mind</b><input data-stat="mind" data-save="mind" type="range" min="0" max="10" value="5"><span>5</span></div>
+                <div class="stat-line"><b>Skill</b><input data-stat="skill" data-save="skill" type="range" min="0" max="10" value="5"><span>5</span></div>
+                <div class="stat-line"><b>Shield</b><input data-stat="shield" data-save="shield" type="range" min="0" max="10" value="5"><span>5</span></div>
+              </div>
+            </div>
+            <div class="dice-row">
+              <button type="button" data-dice="4">d4</button>
+              <button type="button" data-dice="6">d6</button>
+              <button type="button" data-dice="8">d8</button>
+              <button type="button" data-dice="10">d10</button>
+              <button type="button" data-dice="12">d12</button>
+              <button type="button" data-dice="20">d20</button>
+              <output id="diceResult" class="dice-result">Roll</output>
+            </div>
+          </div>
+
+          <div class="panel red-panel">
+            <span class="panel-title">Damage</span>
+            <div class="damage-grid">
+              <div class="damage"><label for="mightDmg">Might</label><input id="mightDmg" data-save="mightDmg" type="number" value="0"></div>
+              <div class="damage"><label for="agilityDmg">Agility</label><input id="agilityDmg" data-save="agilityDmg" type="number" value="0"></div>
+              <div class="damage"><label for="egoDmg">Ego</label><input id="egoDmg" data-save="egoDmg" type="number" value="0"></div>
+              <div class="damage"><label for="logicDmg">Logic</label><input id="logicDmg" data-save="logicDmg" type="number" value="0"></div>
+            </div>
+            <div class="health-controls">
+              <div class="health-control"><label for="maxHealth">Max Health</label><input id="maxHealth" data-save="maxHealth" type="number" min="1" value="100"></div>
+              <div class="health-control"><label for="damageAmount">Damage Amount</label><input id="damageAmount" data-save="damageAmount" type="number" min="0" value="10"></div>
+              <div class="health-control"><label for="healAmount">Heal Amount</label><input id="healAmount" data-save="healAmount" type="number" min="0" value="10"></div>
+            </div>
+            <div class="tracker">
+              <button type="button" data-health-action="damage">Take Damage</button>
+              <button type="button" data-health-action="heal">Heal</button>
+              <button type="button" data-hit="full">Full Heal</button>
+            </div>
+            <div class="meter"><span id="healthMeter"></span></div>
+          </div>
+
+          <div class="panel"><span class="panel-title">Traits & Tags</span><textarea id="traits" data-save="traits" class="tall" placeholder="Battle ready, alien heritage, public identity, mentor, rival..."></textarea></div>
+        </section>
+
+        <section class="right">
+          <label class="hero-art" for="heroInput">
+            <img id="heroPreview" alt="">
+            <span class="drop">Click to add<br>hero illustration</span>
+          </label>
+          <div class="panel red-panel">
+            <span class="panel-title">Biography</span>
+            <div class="bio-grid">
+              <div class="field"><label for="realName">Real Name</label><input id="realName" data-save="realName" type="text"></div>
+              <div class="field"><label for="team">Team</label><input id="team" data-save="team" type="text"></div>
+              <div class="field"><label for="occupation">Occupation</label><input id="occupation" data-save="occupation" type="text"></div>
+              <div class="field"><label for="base">Base</label><input id="base" data-save="base" type="text"></div>
+            </div>
+            <textarea id="history" data-save="history" placeholder="History, personality, dramatic secret, sworn promise..."></textarea>
+          </div>
+          <div class="panel"><span class="panel-title">Powers</span><textarea id="powers" data-save="powers" class="tall" placeholder="Energy blast, flight, healing factor, combat trickery, elemental control..."></textarea></div>
+          <div class="cards">
+            <article class="power-card" data-icon="&#9889;"><label for="action1">Ability Action</label><input id="action1" data-save="action1" type="text"><label for="action1Power">Power</label><textarea id="action1Power" data-save="action1Power"></textarea></article>
+            <article class="power-card" data-icon="&#10022;"><label for="action2">Ability Action</label><input id="action2" data-save="action2" type="text"><label for="action2Power">Power</label><textarea id="action2Power" data-save="action2Power"></textarea></article>
+            <article class="power-card" data-icon="&#9733;"><label for="action3">Ability Action</label><input id="action3" data-save="action3" type="text"><label for="action3Power">Power</label><textarea id="action3Power" data-save="action3Power"></textarea></article>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <input class="hidden-file" id="portraitInput" type="file" accept="image/*">
+  <input class="hidden-file" id="heroInput" type="file" accept="image/*">
+
+  <script>
+    const storeKey = "superhero-ttrpg-sheet-v1";
+    const fields = Array.from(document.querySelectorAll("[data-save]"));
+    const portraitPreview = document.querySelector("#portraitPreview");
+    const heroPreview = document.querySelector("#heroPreview");
+    const health = document.querySelector("#health");
+    const maxHealth = document.querySelector("#maxHealth");
+    const damageAmount = document.querySelector("#damageAmount");
+    const healAmount = document.querySelector("#healAmount");
+    const healthMeter = document.querySelector("#healthMeter");
+    const radarShape = document.querySelector("#radarShape");
+
+    function setImage(kind, dataUrl) {
+      const img = kind === "portrait" ? portraitPreview : heroPreview;
+      img.src = dataUrl || "";
+      img.parentElement.classList.toggle("has-image", Boolean(dataUrl));
+    }
+    function readImage(file, kind) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => { setImage(kind, reader.result); save(); };
+      reader.readAsDataURL(file);
+    }
+    function updateUi() {
+      document.querySelectorAll("[data-stat]").forEach((input) => input.nextElementSibling.textContent = input.value);
+      const statInputs = Array.from(document.querySelectorAll("[data-stat]"));
+      radarShape.setAttribute("points", statInputs.map((input, index) => radarPoint(index, input.value)).join(" "));
+      const max = Math.max(1, Number(maxHealth.value || 1));
+      const current = Math.max(0, Math.min(max, Number(health.value || 0)));
+      if (String(current) !== health.value) health.value = current;
+      const pct = Math.max(0, Math.min(100, current / max * 100));
+      healthMeter.style.width = pct + "%";
+    }
+    function radarPoint(index, value) {
+      const angle = -90 + index * 72;
+      const radius = 9.6 * Number(value);
+      const radians = angle * Math.PI / 180;
+      return [
+        120 + Math.cos(radians) * radius,
+        120 + Math.sin(radians) * radius
+      ].map((number) => number.toFixed(1)).join(",");
+    }
+    function collect() {
+      const data = {};
+      fields.forEach((field) => data[field.dataset.save] = field.value);
+      data.portrait = portraitPreview.src.startsWith("data:") ? portraitPreview.src : "";
+      data.hero = heroPreview.src.startsWith("data:") ? heroPreview.src : "";
+      return data;
+    }
+    function apply(data) {
+      fields.forEach((field) => field.value = data[field.dataset.save] ?? field.defaultValue ?? "");
+      setImage("portrait", data.portrait || "");
+      setImage("hero", data.hero || "");
+      updateUi();
+    }
+    function save() { localStorage.setItem(storeKey, JSON.stringify(collect())); }
+    function load() {
+      const raw = localStorage.getItem(storeKey);
+      if (raw) apply(JSON.parse(raw));
+    }
+    function clearSheet() {
+      fields.forEach((field) => field.value = field.type === "range" ? "5" : field.defaultValue || "");
+      setImage("portrait", "");
+      setImage("hero", "");
+      localStorage.removeItem(storeKey);
+      updateUi();
+    }
+    function exportData() {
+      const blob = new Blob([JSON.stringify(collect(), null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "superhero-ttrpg-character-sheet.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    document.querySelector("#saveBtn").addEventListener("click", save);
+    document.querySelector("#loadBtn").addEventListener("click", load);
+    document.querySelector("#clearBtn").addEventListener("click", clearSheet);
+    document.querySelector("#exportBtn").addEventListener("click", exportData);
+    document.querySelector("#printBtn").addEventListener("click", () => window.print());
+    document.querySelector("#portraitInput").addEventListener("change", (event) => readImage(event.target.files[0], "portrait"));
+    document.querySelector("#heroInput").addEventListener("change", (event) => readImage(event.target.files[0], "hero"));
+    document.querySelector("#importFile").addEventListener("change", (event) => {
+      const [file] = event.target.files;
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => { apply(JSON.parse(reader.result)); save(); event.target.value = ""; };
+      reader.readAsText(file);
+    });
+    fields.forEach((field) => field.addEventListener("input", () => { updateUi(); save(); }));
+    document.querySelectorAll("[data-health-action], [data-hit]").forEach((button) => button.addEventListener("click", () => {
+      const max = Math.max(1, Number(maxHealth.value || 1));
+      const current = Math.max(0, Math.min(max, Number(health.value || 0)));
+      if (button.dataset.hit === "full") {
+        health.value = max;
+      } else if (button.dataset.healthAction === "damage") {
+        health.value = Math.max(0, current - Math.max(0, Number(damageAmount.value || 0)));
+      } else if (button.dataset.healthAction === "heal") {
+        health.value = Math.min(max, current + Math.max(0, Number(healAmount.value || 0)));
+      }
+      updateUi();
+      save();
+    }));
+    document.querySelectorAll("[data-dice]").forEach((button) => button.addEventListener("click", () => {
+      const sides = Number(button.dataset.dice);
+      document.querySelector("#diceResult").textContent = `d${sides}: ${Math.floor(Math.random() * sides) + 1}`;
+    }));
+    updateUi();
+    load();
+  </script>
+</body>
+</html>
