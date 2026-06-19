@@ -6,7 +6,8 @@ Interactive superhero TTRPG character sheet built as a single HTML file.
 
 - Editable character and hero identity fields
 - Portrait and full-body hero image upload slots
-- Rank, karma, current health, and max health
+- Two parent name fields with parent photo upload slots
+- Rank, karma, walking movement, flying movement, current health, and max health
 - Damage and healing controls with a live health bar
 - Ability scores, statistics sliders, and radar chart
 - Dice roller

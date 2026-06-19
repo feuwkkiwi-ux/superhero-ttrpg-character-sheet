@@ -199,6 +199,28 @@
       text-align: center;
       font-size: clamp(1.7rem, 4vw, 2.7rem);
     }
+    .movement-card {
+      display: grid;
+      align-content: center;
+      gap: 8px;
+    }
+    .movement-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .movement-fields span {
+      display: grid;
+      gap: 3px;
+      color: var(--navy);
+      font-size: .8rem;
+      text-transform: uppercase;
+    }
+    .movement-fields input {
+      border: 3px solid var(--ink);
+      background: white;
+      font-size: 1.2rem;
+    }
     .grid {
       display: grid;
       grid-template-columns: .92fr 1.08fr;
@@ -301,7 +323,7 @@
     }
     .health-controls {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 9px;
       margin-top: 10px;
     }
@@ -396,6 +418,45 @@
       min-height: 60px;
       box-shadow: 3px 3px 0 var(--ink);
     }
+    .parents-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 9px;
+    }
+    .parent-card {
+      display: grid;
+      gap: 8px;
+      border: 5px solid var(--ink);
+      background: rgba(255,255,255,.94);
+      box-shadow: 3px 3px 0 var(--ink);
+      padding: 10px;
+    }
+    .parent-card label {
+      font-size: 1rem;
+    }
+    .parent-photo {
+      min-height: 150px;
+      display: grid;
+      place-items: center;
+      border: 4px solid var(--ink);
+      background:
+        repeating-radial-gradient(circle at center, transparent 0 22px, rgba(17,28,79,.12) 23px 24px),
+        white;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .parent-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    .parent-photo.has-image img { display: block; }
+    .parent-photo.has-image .drop { display: none; }
+    .parent-photo .drop {
+      font-size: 1rem;
+    }
     .tall { min-height: 215px; }
     .cards {
       display: grid;
@@ -464,7 +525,7 @@
     @media (max-width: 700px) {
       .sheet { padding: 18px; }
       .stripe { margin: -18px -18px 14px; padding-inline: 18px; }
-      .row, .abilities, .damage-grid, .health-controls, .bio-grid, .cards, .rank-stack, .statistics-grid { grid-template-columns: 1fr; }
+      .row, .abilities, .damage-grid, .health-controls, .bio-grid, .parents-grid, .cards, .rank-stack, .statistics-grid { grid-template-columns: 1fr; }
       .hero-art { min-height: 500px; }
       .stat-line { grid-template-columns: 90px 1fr 30px; }
     }
@@ -503,7 +564,13 @@
         <div class="rank-stack">
           <div class="rank-card"><label for="rank">Rank</label><input id="rank" data-save="rank" type="number" min="1" max="20" value="1"></div>
           <div class="rank-card"><label for="karma">Karma</label><input id="karma" data-save="karma" type="number" min="0" value="0"></div>
-          <div class="rank-card"><label for="health">Health</label><input id="health" data-save="health" type="number" min="0" value="100"></div>
+          <div class="rank-card movement-card">
+            <label>Movement</label>
+            <div class="movement-fields">
+              <span>Walk (ft)<input id="walkSpeed" data-save="walkSpeed" type="number" value="30"></span>
+              <span>Fly (ft)<input id="flySpeed" data-save="flySpeed" type="number" value="0"></span>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -583,6 +650,7 @@
               <div class="damage"><label for="logicDmg">Logic</label><input id="logicDmg" data-save="logicDmg" type="number" value="0"></div>
             </div>
             <div class="health-controls">
+              <div class="health-control"><label for="health">Current Health</label><input id="health" data-save="health" type="number" min="0" value="100"></div>
               <div class="health-control"><label for="maxHealth">Max Health</label><input id="maxHealth" data-save="maxHealth" type="number" min="1" value="100"></div>
               <div class="health-control"><label for="damageAmount">Damage Amount</label><input id="damageAmount" data-save="damageAmount" type="number" min="0" value="10"></div>
               <div class="health-control"><label for="healAmount">Heal Amount</label><input id="healAmount" data-save="healAmount" type="number" min="0" value="10"></div>
@@ -605,8 +673,25 @@
           </label>
           <div class="panel red-panel">
             <span class="panel-title">Biography</span>
+            <div class="parents-grid">
+              <div class="parent-card">
+                <label for="parentOneName">Parent Name</label>
+                <input id="parentOneName" data-save="parentOneName" type="text">
+                <label class="parent-photo" for="parentOneInput">
+                  <img id="parentOnePreview" alt="">
+                  <span class="drop">Parent<br>Photo</span>
+                </label>
+              </div>
+              <div class="parent-card">
+                <label for="parentTwoName">Parent Name</label>
+                <input id="parentTwoName" data-save="parentTwoName" type="text">
+                <label class="parent-photo" for="parentTwoInput">
+                  <img id="parentTwoPreview" alt="">
+                  <span class="drop">Parent<br>Photo</span>
+                </label>
+              </div>
+            </div>
             <div class="bio-grid">
-              <div class="field"><label for="realName">Real Name</label><input id="realName" data-save="realName" type="text"></div>
               <div class="field"><label for="team">Team</label><input id="team" data-save="team" type="text"></div>
               <div class="field"><label for="occupation">Occupation</label><input id="occupation" data-save="occupation" type="text"></div>
               <div class="field"><label for="base">Base</label><input id="base" data-save="base" type="text"></div>
@@ -626,12 +711,16 @@
 
   <input class="hidden-file" id="portraitInput" type="file" accept="image/*">
   <input class="hidden-file" id="heroInput" type="file" accept="image/*">
+  <input class="hidden-file" id="parentOneInput" type="file" accept="image/*">
+  <input class="hidden-file" id="parentTwoInput" type="file" accept="image/*">
 
   <script>
     const storeKey = "superhero-ttrpg-sheet-v1";
     const fields = Array.from(document.querySelectorAll("[data-save]"));
     const portraitPreview = document.querySelector("#portraitPreview");
     const heroPreview = document.querySelector("#heroPreview");
+    const parentOnePreview = document.querySelector("#parentOnePreview");
+    const parentTwoPreview = document.querySelector("#parentTwoPreview");
     const health = document.querySelector("#health");
     const maxHealth = document.querySelector("#maxHealth");
     const damageAmount = document.querySelector("#damageAmount");
@@ -640,7 +729,13 @@
     const radarShape = document.querySelector("#radarShape");
 
     function setImage(kind, dataUrl) {
-      const img = kind === "portrait" ? portraitPreview : heroPreview;
+      const images = {
+        portrait: portraitPreview,
+        hero: heroPreview,
+        parentOne: parentOnePreview,
+        parentTwo: parentTwoPreview
+      };
+      const img = images[kind];
       img.src = dataUrl || "";
       img.parentElement.classList.toggle("has-image", Boolean(dataUrl));
     }
@@ -674,12 +769,16 @@
       fields.forEach((field) => data[field.dataset.save] = field.value);
       data.portrait = portraitPreview.src.startsWith("data:") ? portraitPreview.src : "";
       data.hero = heroPreview.src.startsWith("data:") ? heroPreview.src : "";
+      data.parentOne = parentOnePreview.src.startsWith("data:") ? parentOnePreview.src : "";
+      data.parentTwo = parentTwoPreview.src.startsWith("data:") ? parentTwoPreview.src : "";
       return data;
     }
     function apply(data) {
       fields.forEach((field) => field.value = data[field.dataset.save] ?? field.defaultValue ?? "");
       setImage("portrait", data.portrait || "");
       setImage("hero", data.hero || "");
+      setImage("parentOne", data.parentOne || "");
+      setImage("parentTwo", data.parentTwo || "");
       updateUi();
     }
     function save() { localStorage.setItem(storeKey, JSON.stringify(collect())); }
@@ -691,6 +790,8 @@
       fields.forEach((field) => field.value = field.type === "range" ? "5" : field.defaultValue || "");
       setImage("portrait", "");
       setImage("hero", "");
+      setImage("parentOne", "");
+      setImage("parentTwo", "");
       localStorage.removeItem(storeKey);
       updateUi();
     }
@@ -711,6 +812,8 @@
     document.querySelector("#printBtn").addEventListener("click", () => window.print());
     document.querySelector("#portraitInput").addEventListener("change", (event) => readImage(event.target.files[0], "portrait"));
     document.querySelector("#heroInput").addEventListener("change", (event) => readImage(event.target.files[0], "hero"));
+    document.querySelector("#parentOneInput").addEventListener("change", (event) => readImage(event.target.files[0], "parentOne"));
+    document.querySelector("#parentTwoInput").addEventListener("change", (event) => readImage(event.target.files[0], "parentTwo"));
     document.querySelector("#importFile").addEventListener("change", (event) => {
       const [file] = event.target.files;
       if (!file) return;
