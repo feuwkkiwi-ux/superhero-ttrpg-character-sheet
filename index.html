@@ -674,6 +674,7 @@
       <select id="exportChoice">
         <option value="html">HTML</option>
         <option value="pdf">PDF</option>
+        <option value="png">PNG</option>
         <option value="obsidian">Obsidian .md</option>
         <option value="json">Data</option>
       </select>
@@ -1061,10 +1062,65 @@ Open this note in reading view to use the interactive sheet.
 `;
       downloadTextFile(noteName, note, "text/markdown");
     }
+    function copyFormValues(source, clone) {
+      const sourceFields = Array.from(source.querySelectorAll("input, textarea, select"));
+      const cloneFields = Array.from(clone.querySelectorAll("input, textarea, select"));
+      sourceFields.forEach((field, index) => {
+        const copy = cloneFields[index];
+        if (!copy) return;
+        if (copy.tagName === "TEXTAREA") copy.textContent = field.value;
+        if (copy.tagName === "SELECT") {
+          Array.from(copy.options).forEach((option) => {
+            option.selected = option.value === field.value || option.text === field.value;
+          });
+        }
+        if (copy.tagName === "INPUT") copy.setAttribute("value", field.value);
+      });
+    }
+    function exportPng() {
+      const sheet = document.querySelector(".sheet");
+      const clone = sheet.cloneNode(true);
+      copyFormValues(sheet, clone);
+      clone.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+      const width = Math.ceil(sheet.scrollWidth);
+      const height = Math.ceil(sheet.scrollHeight);
+      const styles = Array.from(document.querySelectorAll("style")).map((style) => style.textContent).join("\n");
+      const markup = new XMLSerializer().serializeToString(clone);
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+        <foreignObject width="100%" height="100%">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <style>${styles}</style>
+            ${markup}
+          </div>
+        </foreignObject>
+      </svg>`;
+      const image = new Image();
+      const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }));
+      image.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext("2d");
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, width, height);
+        context.drawImage(image, 0, 0);
+        URL.revokeObjectURL(url);
+        const a = document.createElement("a");
+        a.href = canvas.toDataURL("image/png");
+        a.download = characterFileName("png");
+        a.click();
+      };
+      image.onerror = () => {
+        URL.revokeObjectURL(url);
+        alert("PNG export could not render in this browser. Try HTML or PDF instead.");
+      };
+      image.src = url;
+    }
     function runExport() {
       const choice = document.querySelector("#exportChoice").value;
       if (choice === "html") exportHtml();
       if (choice === "pdf") window.print();
+      if (choice === "png") exportPng();
       if (choice === "obsidian") exportObsidian();
       if (choice === "json") exportData();
     }
