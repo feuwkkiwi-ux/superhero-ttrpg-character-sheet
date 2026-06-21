@@ -483,14 +483,14 @@
     }
     .cards {
       display: grid;
-      grid-template-columns: repeat(8, minmax(0, 1fr));
-      gap: 8px;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
       padding-top: 32px;
     }
     .power-card {
       position: relative;
-      min-height: 250px;
-      padding: 48px 8px 8px;
+      min-height: 320px;
+      padding: 54px 10px 10px;
       border-color: var(--navy);
       border-radius: 10px;
       background:
@@ -531,7 +531,7 @@
       font-size: 1.65rem;
       box-shadow: 0 0 0 5px var(--red), 4px 4px 0 var(--ink);
     }
-    .power-card textarea { min-height: 84px; }
+    .power-card textarea { min-height: 150px; }
     .dice-row {
       display: flex;
       flex-wrap: wrap;
@@ -608,7 +608,7 @@
         grid-template-columns: minmax(220px, 1fr) 1fr;
       }
       .cards {
-        grid-template-columns: repeat(8, minmax(0, 1fr));
+        grid-template-columns: repeat(5, minmax(0, 1fr));
       }
     }
   </style>
@@ -806,9 +806,6 @@
         <article class="power-card"><input class="card-number" aria-label="Card three number" data-save="action3Number" type="number"><label for="action3">Quirk</label><input id="action3" data-save="action3" type="text"><label for="action3Power">Description</label><textarea id="action3Power" data-save="action3Power"></textarea></article>
         <article class="power-card"><input class="card-number" aria-label="Card four number" data-save="action4Number" type="number"><label for="action4">Quirk</label><input id="action4" data-save="action4" type="text"><label for="action4Power">Description</label><textarea id="action4Power" data-save="action4Power"></textarea></article>
         <article class="power-card"><input class="card-number" aria-label="Card five number" data-save="action5Number" type="number"><label for="action5">Quirk</label><input id="action5" data-save="action5" type="text"><label for="action5Power">Description</label><textarea id="action5Power" data-save="action5Power"></textarea></article>
-        <article class="power-card"><input class="card-number" aria-label="Card six number" data-save="action6Number" type="number"><label for="action6">Quirk</label><input id="action6" data-save="action6" type="text"><label for="action6Power">Description</label><textarea id="action6Power" data-save="action6Power"></textarea></article>
-        <article class="power-card"><input class="card-number" aria-label="Card seven number" data-save="action7Number" type="number"><label for="action7">Quirk</label><input id="action7" data-save="action7" type="text"><label for="action7Power">Description</label><textarea id="action7Power" data-save="action7Power"></textarea></article>
-        <article class="power-card"><input class="card-number" aria-label="Card eight number" data-save="action8Number" type="number"><label for="action8">Quirk</label><input id="action8" data-save="action8" type="text"><label for="action8Power">Description</label><textarea id="action8Power" data-save="action8Power"></textarea></article>
       </div>
     </section>
   </main>
@@ -1016,10 +1013,84 @@ Open this note in reading view to use the interactive sheet.
         if (copy.tagName === "INPUT") copy.setAttribute("value", field.value);
       });
     }
+    function makeExportTextBox(field) {
+      const box = document.createElement("div");
+      const style = getComputedStyle(field);
+      box.textContent = field.tagName === "SELECT"
+        ? field.options[field.selectedIndex]?.text || ""
+        : field.value || "";
+      box.style.width = "100%";
+      box.style.minHeight = Math.max(field.scrollHeight, field.offsetHeight, 28) + "px";
+      box.style.padding = style.padding;
+      box.style.border = style.border;
+      box.style.background = style.backgroundColor === "rgba(0, 0, 0, 0)" ? "transparent" : style.background;
+      box.style.color = style.color;
+      box.style.fontFamily = style.fontFamily;
+      box.style.fontSize = style.fontSize;
+      box.style.fontWeight = style.fontWeight;
+      box.style.lineHeight = style.lineHeight;
+      box.style.whiteSpace = "pre-wrap";
+      box.style.overflow = "visible";
+      box.style.wordBreak = "break-word";
+      return box;
+    }
+    function makeExportRange(field) {
+      const wrap = document.createElement("div");
+      const value = Number(field.value || 0);
+      const min = Number(field.min || 0);
+      const max = Number(field.max || 10);
+      const pct = Math.max(0, Math.min(100, (value - min) / Math.max(1, max - min) * 100));
+      wrap.style.position = "relative";
+      wrap.style.width = "100%";
+      wrap.style.height = "18px";
+      wrap.style.display = "flex";
+      wrap.style.alignItems = "center";
+      const track = document.createElement("div");
+      track.style.width = "100%";
+      track.style.height = "6px";
+      track.style.border = "1px solid #aab4bd";
+      track.style.borderRadius = "999px";
+      track.style.background = "#f6f6f6";
+      track.style.overflow = "hidden";
+      const fill = document.createElement("span");
+      fill.style.display = "block";
+      fill.style.width = `${pct}%`;
+      fill.style.height = "100%";
+      fill.style.background = "#d91e2d";
+      const knob = document.createElement("span");
+      knob.style.position = "absolute";
+      knob.style.left = `calc(${pct}% - 7px)`;
+      knob.style.top = "2px";
+      knob.style.width = "14px";
+      knob.style.height = "14px";
+      knob.style.borderRadius = "50%";
+      knob.style.background = "#d91e2d";
+      track.appendChild(fill);
+      wrap.append(track, knob);
+      return wrap;
+    }
+    function prepareExportClone(source) {
+      const clone = source.cloneNode(true);
+      clone.classList.add("exporting-image");
+      copyFormValues(source, clone);
+      const sourceFields = Array.from(source.querySelectorAll("input, textarea, select"));
+      const cloneFields = Array.from(clone.querySelectorAll("input, textarea, select"));
+      sourceFields.forEach((field, index) => {
+        const copy = cloneFields[index];
+        if (!copy) return;
+        if (field.type === "range") {
+          copy.replaceWith(makeExportRange(field));
+        } else {
+          copy.replaceWith(makeExportTextBox(field));
+        }
+      });
+      clone.style.width = source.scrollWidth + "px";
+      clone.style.minHeight = source.scrollHeight + "px";
+      return clone;
+    }
     function exportSvgFallback() {
       const sheet = document.querySelector(".sheet");
-      const clone = sheet.cloneNode(true);
-      copyFormValues(sheet, clone);
+      const clone = prepareExportClone(sheet);
       clone.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
       const width = Math.ceil(sheet.scrollWidth);
       const height = Math.ceil(sheet.scrollHeight);
@@ -1065,8 +1136,14 @@ Open this note in reading view to use the interactive sheet.
         exportSvgFallback();
         return;
       }
+      const clone = prepareExportClone(sheet);
+      clone.style.position = "fixed";
+      clone.style.left = "-10000px";
+      clone.style.top = "0";
+      clone.style.zIndex = "-1";
+      document.body.appendChild(clone);
       try {
-        const canvas = await html2canvas(sheet, {
+        const canvas = await html2canvas(clone, {
           backgroundColor: "#ffffff",
           scale: 2,
           useCORS: true
@@ -1076,6 +1153,8 @@ Open this note in reading view to use the interactive sheet.
         console.error(error);
         alert("PNG export was blocked by this browser. I will download an SVG image instead.");
         exportSvgFallback();
+      } finally {
+        clone.remove();
       }
     }
     function loadEmbeddedCharacter() {
