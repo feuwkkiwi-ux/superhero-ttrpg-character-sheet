@@ -91,6 +91,30 @@
       background: var(--pale);
       color: var(--ink);
     }
+    .export-picker {
+      display: inline-flex;
+      align-items: stretch;
+      min-height: 38px;
+      border: 3px solid var(--ink);
+      background: var(--yellow);
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+    .export-picker label {
+      border: 0;
+      box-shadow: none;
+    }
+    .export-picker select {
+      min-width: 112px;
+      border: 0;
+      border-left: 3px solid var(--ink);
+      padding: 0 8px;
+      background: white;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: .9rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
     .page {
       width: min(1260px, 100%);
       margin: 0 auto;
@@ -602,10 +626,15 @@
     <button id="saveBtn" type="button">Save</button>
     <button id="loadBtn" type="button">Load</button>
     <button id="clearBtn" type="button">Clear</button>
-    <button id="exportBtn" type="button">Export</button>
-    <button id="exportHtmlBtn" type="button">Export HTML</button>
+    <div class="export-picker">
+      <label for="exportChoice">Export</label>
+      <select id="exportChoice">
+        <option value="html">HTML</option>
+        <option value="pdf">PDF</option>
+        <option value="json">Data</option>
+      </select>
+    </div>
     <label>Import<input id="importFile" type="file" accept="application/json"></label>
-    <button id="exportPdfBtn" type="button">Export PDF</button>
   </nav>
 
   <main class="page">
@@ -957,6 +986,12 @@
       a.click();
       URL.revokeObjectURL(url);
     }
+    function runExport() {
+      const choice = document.querySelector("#exportChoice").value;
+      if (choice === "html") exportHtml();
+      if (choice === "pdf") window.print();
+      if (choice === "json") exportData();
+    }
 
     setCharacterSlot(characterId, false);
     characterSlot.addEventListener("keydown", (event) => {
@@ -966,9 +1001,10 @@
     document.querySelector("#saveBtn").addEventListener("click", save);
     document.querySelector("#loadBtn").addEventListener("click", load);
     document.querySelector("#clearBtn").addEventListener("click", clearSheet);
-    document.querySelector("#exportBtn").addEventListener("click", exportData);
-    document.querySelector("#exportHtmlBtn").addEventListener("click", exportHtml);
-    document.querySelector("#exportPdfBtn").addEventListener("click", () => window.print());
+    document.querySelector(".export-picker label").addEventListener("click", runExport);
+    document.querySelector("#exportChoice").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") runExport();
+    });
     document.querySelector("#portraitInput").addEventListener("change", (event) => readImage(event.target.files[0], "portrait"));
     document.querySelector("#characterBodyInput").addEventListener("change", (event) => readImage(event.target.files[0], "characterBody"));
     document.querySelector("#heroCostumeInput").addEventListener("change", (event) => readImage(event.target.files[0], "heroCostume"));
