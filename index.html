@@ -50,15 +50,46 @@
       color: var(--ink);
       box-shadow: 3px 3px 0 var(--ink);
       cursor: pointer;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: .9rem;
+      font-weight: 900;
+      letter-spacing: 0;
       text-transform: uppercase;
-      line-height: 1;
+      line-height: 1.1;
+      white-space: nowrap;
     }
-    .toolbar input, .hidden-file {
+    .toolbar input[type="file"], .hidden-file {
       position: absolute;
       width: 1px;
       height: 1px;
       opacity: 0;
       pointer-events: none;
+    }
+    .character-switcher {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 6px 10px;
+      border: 3px solid var(--ink);
+      background: white;
+      box-shadow: 3px 3px 0 var(--ink);
+      text-transform: uppercase;
+      line-height: 1;
+      min-width: 420px;
+    }
+    .character-switcher span {
+      color: var(--navy);
+      flex: 0 0 auto;
+    }
+    .character-switcher input {
+      width: 100%;
+      min-width: 210px;
+      min-height: 26px;
+      border: 3px solid var(--ink);
+      padding: 3px 6px;
+      background: var(--pale);
+      color: var(--ink);
     }
     .page {
       width: min(1260px, 100%);
@@ -315,12 +346,6 @@
       text-shadow: 2px 2px 0 var(--ink), -1px -1px 0 var(--ink), 1px -1px 0 var(--ink), -1px 1px 0 var(--ink);
     }
     input[type="range"] { width: 100%; accent-color: var(--red); }
-    .damage-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 9px;
-      margin-top: 10px;
-    }
     .health-controls {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -333,11 +358,16 @@
       border: 4px solid var(--ink);
       background: rgba(255,255,255,.96);
       box-shadow: 3px 3px 0 var(--ink);
+      display: grid;
+      align-content: start;
     }
     .health-control label {
       color: var(--navy);
       text-shadow: none;
       font-size: .95rem;
+      min-height: 34px;
+      display: flex;
+      align-items: flex-start;
     }
     .health-control input {
       margin-top: 6px;
@@ -346,22 +376,6 @@
       color: var(--ink);
       text-align: center;
       font-size: 1.25rem;
-    }
-    .damage {
-      min-height: 96px;
-      padding: 8px;
-      border-color: var(--dark-red);
-      background: var(--red);
-      box-shadow: 3px 3px 0 var(--ink);
-    }
-    .damage label { font-size: .95rem; }
-    .damage input {
-      margin-top: 6px;
-      border: 3px solid var(--ink);
-      background: white;
-      color: var(--ink);
-      text-align: center;
-      font-size: 1.4rem;
     }
     .tracker {
       display: grid;
@@ -377,11 +391,12 @@
     }
     .tracker button { min-height: 42px; background: var(--yellow); }
     .meter {
-      height: 22px;
-      margin-top: 10px;
-      border: 3px solid var(--ink);
+      height: 54px;
+      margin-top: 14px;
+      border: 5px solid var(--ink);
       background: white;
       overflow: hidden;
+      box-shadow: 4px 4px 0 var(--ink);
     }
     .meter span {
       display: block;
@@ -389,14 +404,19 @@
       height: 100%;
       background: linear-gradient(90deg, var(--red), var(--yellow));
     }
+    .illustration-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
     .hero-art {
-      min-height: 620px;
+      min-height: 560px;
       background:
         repeating-radial-gradient(circle at center, transparent 0 36px, rgba(17,28,79,.16) 37px 38px),
         linear-gradient(180deg, rgba(255,255,255,.98), rgba(237,246,251,.93));
     }
     .hero-art::after {
-      content: "FULL-BODY HERO ILLUSTRATION AREA";
+      content: attr(data-caption);
       position: absolute;
       left: 0;
       right: 0;
@@ -417,6 +437,26 @@
     .bio-grid .field {
       min-height: 60px;
       box-shadow: 3px 3px 0 var(--ink);
+    }
+    .description-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .description-box {
+      display: grid;
+      gap: 6px;
+      border: 5px solid var(--ink);
+      background: rgba(255,255,255,.94);
+      box-shadow: 3px 3px 0 var(--ink);
+      padding: 10px;
+    }
+    .description-box textarea {
+      min-height: 110px;
+      border: 3px solid var(--line);
+      background: var(--pale);
+      padding: 8px;
     }
     .parents-grid {
       display: grid;
@@ -458,45 +498,60 @@
       font-size: 1rem;
     }
     .tall { min-height: 215px; }
+    .quirk-panel textarea {
+      min-height: 285px;
+    }
     .cards {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: 8px;
+      padding-top: 32px;
     }
     .power-card {
       position: relative;
-      min-height: 248px;
-      padding: 48px 10px 10px;
+      min-height: 250px;
+      padding: 48px 8px 8px;
       border-color: var(--navy);
       border-radius: 10px;
       background:
         linear-gradient(135deg, transparent 0 67%, var(--yellow) 67% 72%, var(--blue) 72% 78%, var(--red) 78% 84%, transparent 84%),
         white;
     }
-    .power-card::before {
-      content: attr(data-icon);
+    .card-number {
       position: absolute;
-      top: -31px;
+      top: -30px;
       left: 50%;
-      width: 76px;
-      height: 76px;
-      display: grid;
-      place-items: center;
       transform: translateX(-50%);
+      width: 68px;
+      height: 68px;
       border: 5px solid var(--navy);
       border-radius: 50%;
       background: white;
-      color: var(--navy);
       box-shadow: 0 0 0 5px var(--red), 4px 4px 0 var(--ink);
-      font-size: 2rem;
+      color: var(--navy);
+      text-align: center;
+      font-size: 1.65rem;
+      padding: 0;
+      outline: 0;
     }
     .power-card input, .power-card textarea {
       border: 3px solid var(--line);
       background: var(--pale);
       padding: 6px;
-      font-size: 1rem;
+      font-size: .9rem;
     }
-    .power-card textarea { min-height: 76px; }
+    .power-card label {
+      font-size: clamp(.88rem, 1.25vw, 1.05rem);
+    }
+    .power-card .card-number {
+      border: 5px solid var(--navy);
+      border-radius: 50%;
+      background: white;
+      padding: 0;
+      font-size: 1.65rem;
+      box-shadow: 0 0 0 5px var(--red), 4px 4px 0 var(--ink);
+    }
+    .power-card textarea { min-height: 84px; }
     .dice-row {
       display: flex;
       flex-wrap: wrap;
@@ -525,7 +580,10 @@
     @media (max-width: 700px) {
       .sheet { padding: 18px; }
       .stripe { margin: -18px -18px 14px; padding-inline: 18px; }
-      .row, .abilities, .damage-grid, .health-controls, .bio-grid, .parents-grid, .cards, .rank-stack, .statistics-grid { grid-template-columns: 1fr; }
+      .toolbar { justify-content: stretch; }
+      .toolbar button, .toolbar label { flex: 1 1 auto; }
+      .character-switcher { min-width: 100%; }
+      .row, .abilities, .health-controls, .bio-grid, .parents-grid, .cards, .rank-stack, .statistics-grid, .illustration-grid { grid-template-columns: 1fr; }
       .hero-art { min-height: 500px; }
       .stat-line { grid-template-columns: 90px 1fr 30px; }
     }
@@ -539,6 +597,8 @@
 </head>
 <body>
   <nav class="toolbar" aria-label="Sheet tools">
+    <label class="character-switcher" for="characterSlot"><span>Character</span><input id="characterSlot" type="text" placeholder="default"></label>
+    <button id="openCharacterBtn" type="button">Open Character</button>
     <button id="saveBtn" type="button">Save</button>
     <button id="loadBtn" type="button">Load</button>
     <button id="clearBtn" type="button">Clear</button>
@@ -582,7 +642,7 @@
           </div>
           <div class="row">
             <div class="field"><label for="gender">Gender</label><input id="gender" data-save="gender" type="text"></div>
-            <div class="field"><label for="origin">Origin</label><input id="origin" data-save="origin" type="text"></div>
+            <div class="field"><label for="origin">Occupation</label><input id="origin" data-save="origin" type="text"></div>
           </div>
           <div class="field"><label for="quirk">Power / Quirk</label><input id="quirk" data-save="quirk" type="text"></div>
 
@@ -592,8 +652,8 @@
               <div class="ability"><label for="melee">Melee</label><input id="melee" data-save="melee" type="number" value="0"></div>
               <div class="ability"><label for="agility">Agility</label><input id="agility" data-save="agility" type="number" value="0"></div>
               <div class="ability"><label for="resilience">Resilience</label><input id="resilience" data-save="resilience" type="number" value="0"></div>
-              <div class="ability"><label for="vigilance">Vigilance</label><input id="vigilance" data-save="vigilance" type="number" value="0"></div>
-              <div class="ability"><label for="ego">Ego</label><input id="ego" data-save="ego" type="number" value="0"></div>
+              <div class="ability"><label for="perceptive">Perceptive</label><input id="perceptive" data-save="perceptive" type="number" value="0"></div>
+              <div class="ability"><label for="charisma">Charisma</label><input id="charisma" data-save="charisma" type="number" value="0"></div>
               <div class="ability"><label for="logic">Logic</label><input id="logic" data-save="logic" type="number" value="0"></div>
             </div>
           </div>
@@ -643,12 +703,6 @@
 
           <div class="panel red-panel">
             <span class="panel-title">Damage</span>
-            <div class="damage-grid">
-              <div class="damage"><label for="mightDmg">Might</label><input id="mightDmg" data-save="mightDmg" type="number" value="0"></div>
-              <div class="damage"><label for="agilityDmg">Agility</label><input id="agilityDmg" data-save="agilityDmg" type="number" value="0"></div>
-              <div class="damage"><label for="egoDmg">Ego</label><input id="egoDmg" data-save="egoDmg" type="number" value="0"></div>
-              <div class="damage"><label for="logicDmg">Logic</label><input id="logicDmg" data-save="logicDmg" type="number" value="0"></div>
-            </div>
             <div class="health-controls">
               <div class="health-control"><label for="health">Current Health</label><input id="health" data-save="health" type="number" min="0" value="100"></div>
               <div class="health-control"><label for="maxHealth">Max Health</label><input id="maxHealth" data-save="maxHealth" type="number" min="1" value="100"></div>
@@ -663,14 +717,35 @@
             <div class="meter"><span id="healthMeter"></span></div>
           </div>
 
-          <div class="panel"><span class="panel-title">Traits & Tags</span><textarea id="traits" data-save="traits" class="tall" placeholder="Battle ready, alien heritage, public identity, mentor, rival..."></textarea></div>
+          <div class="panel quirk-panel">
+            <span class="panel-title">Quirk</span>
+            <div class="field">
+              <label for="quirkSpeciality">Quirk Speciality</label>
+              <select id="quirkSpeciality" data-save="quirkSpeciality">
+                <option value=""></option>
+                <option>Melee</option>
+                <option>Resilience</option>
+                <option>Charisma</option>
+                <option>Agility</option>
+                <option>Perceptive</option>
+                <option>Logic</option>
+              </select>
+            </div>
+            <textarea id="powers" data-save="powers" class="tall" placeholder="Quirk effects, limits, special moves, drawbacks..."></textarea>
+          </div>
         </section>
 
         <section class="right">
-          <label class="hero-art" for="heroInput">
-            <img id="heroPreview" alt="">
-            <span class="drop">Click to add<br>hero illustration</span>
-          </label>
+          <div class="illustration-grid">
+            <label class="hero-art" data-caption="FULL-BODY CHARACTER AREA" for="characterBodyInput">
+              <img id="characterBodyPreview" alt="">
+              <span class="drop">Click to add<br>full-body character</span>
+            </label>
+            <label class="hero-art" data-caption="FULL HERO COSTUME AREA" for="heroCostumeInput">
+              <img id="heroCostumePreview" alt="">
+              <span class="drop">Click to add<br>hero costume</span>
+            </label>
+          </div>
           <div class="panel red-panel">
             <span class="panel-title">Biography</span>
             <div class="parents-grid">
@@ -692,33 +767,53 @@
               </div>
             </div>
             <div class="bio-grid">
-              <div class="field"><label for="team">Team</label><input id="team" data-save="team" type="text"></div>
-              <div class="field"><label for="occupation">Occupation</label><input id="occupation" data-save="occupation" type="text"></div>
-              <div class="field"><label for="base">Base</label><input id="base" data-save="base" type="text"></div>
+              <div class="field"><label for="bloodType">Blood Type</label><input id="bloodType" data-save="bloodType" type="text"></div>
+              <div class="field"><label for="eyeColor">Eye Color</label><input id="eyeColor" data-save="eyeColor" type="text"></div>
+              <div class="field"><label for="hair">Hair</label><input id="hair" data-save="hair" type="text"></div>
+              <div class="field"><label for="skin">Skin</label><input id="skin" data-save="skin" type="text"></div>
             </div>
-            <textarea id="history" data-save="history" placeholder="History, personality, dramatic secret, sworn promise..."></textarea>
+            <div class="description-grid">
+              <div class="description-box">
+                <label for="characterDescription">Character Description</label>
+                <textarea id="characterDescription" data-save="characterDescription" placeholder="Personality, appearance, history, secrets, promises..."></textarea>
+              </div>
+              <div class="description-box">
+                <label for="costumeDescription">Hero Costume Description</label>
+                <textarea id="costumeDescription" data-save="costumeDescription" placeholder="Suit design, colors, mask, symbols, gear, support items..."></textarea>
+              </div>
+            </div>
           </div>
-          <div class="panel"><span class="panel-title">Powers</span><textarea id="powers" data-save="powers" class="tall" placeholder="Energy blast, flight, healing factor, combat trickery, elemental control..."></textarea></div>
-          <div class="cards">
-            <article class="power-card" data-icon="&#9889;"><label for="action1">Ability Action</label><input id="action1" data-save="action1" type="text"><label for="action1Power">Power</label><textarea id="action1Power" data-save="action1Power"></textarea></article>
-            <article class="power-card" data-icon="&#10022;"><label for="action2">Ability Action</label><input id="action2" data-save="action2" type="text"><label for="action2Power">Power</label><textarea id="action2Power" data-save="action2Power"></textarea></article>
-            <article class="power-card" data-icon="&#9733;"><label for="action3">Ability Action</label><input id="action3" data-save="action3" type="text"><label for="action3Power">Power</label><textarea id="action3Power" data-save="action3Power"></textarea></article>
-          </div>
+          <div class="panel"><span class="panel-title">Traits & Tags</span><textarea id="traits" data-save="traits" class="tall" placeholder="Battle ready, alien heritage, public identity, mentor, rival..."></textarea></div>
         </section>
+      </div>
+      <div class="cards">
+        <article class="power-card"><input class="card-number" aria-label="Card one number" data-save="action1Number" type="number"><label for="action1">Quirk</label><input id="action1" data-save="action1" type="text"><label for="action1Power">Description</label><textarea id="action1Power" data-save="action1Power"></textarea></article>
+        <article class="power-card"><input class="card-number" aria-label="Card two number" data-save="action2Number" type="number"><label for="action2">Quirk</label><input id="action2" data-save="action2" type="text"><label for="action2Power">Description</label><textarea id="action2Power" data-save="action2Power"></textarea></article>
+        <article class="power-card"><input class="card-number" aria-label="Card three number" data-save="action3Number" type="number"><label for="action3">Quirk</label><input id="action3" data-save="action3" type="text"><label for="action3Power">Description</label><textarea id="action3Power" data-save="action3Power"></textarea></article>
+        <article class="power-card"><input class="card-number" aria-label="Card four number" data-save="action4Number" type="number"><label for="action4">Quirk</label><input id="action4" data-save="action4" type="text"><label for="action4Power">Description</label><textarea id="action4Power" data-save="action4Power"></textarea></article>
+        <article class="power-card"><input class="card-number" aria-label="Card five number" data-save="action5Number" type="number"><label for="action5">Quirk</label><input id="action5" data-save="action5" type="text"><label for="action5Power">Description</label><textarea id="action5Power" data-save="action5Power"></textarea></article>
+        <article class="power-card"><input class="card-number" aria-label="Card six number" data-save="action6Number" type="number"><label for="action6">Quirk</label><input id="action6" data-save="action6" type="text"><label for="action6Power">Description</label><textarea id="action6Power" data-save="action6Power"></textarea></article>
+        <article class="power-card"><input class="card-number" aria-label="Card seven number" data-save="action7Number" type="number"><label for="action7">Quirk</label><input id="action7" data-save="action7" type="text"><label for="action7Power">Description</label><textarea id="action7Power" data-save="action7Power"></textarea></article>
+        <article class="power-card"><input class="card-number" aria-label="Card eight number" data-save="action8Number" type="number"><label for="action8">Quirk</label><input id="action8" data-save="action8" type="text"><label for="action8Power">Description</label><textarea id="action8Power" data-save="action8Power"></textarea></article>
       </div>
     </section>
   </main>
 
   <input class="hidden-file" id="portraitInput" type="file" accept="image/*">
-  <input class="hidden-file" id="heroInput" type="file" accept="image/*">
+  <input class="hidden-file" id="characterBodyInput" type="file" accept="image/*">
+  <input class="hidden-file" id="heroCostumeInput" type="file" accept="image/*">
   <input class="hidden-file" id="parentOneInput" type="file" accept="image/*">
   <input class="hidden-file" id="parentTwoInput" type="file" accept="image/*">
 
   <script>
-    const storeKey = "superhero-ttrpg-sheet-v1";
+    const params = new URLSearchParams(window.location.search);
+    let characterId = cleanCharacterId(params.get("character") || "default");
+    let storeKey = storageKey(characterId);
     const fields = Array.from(document.querySelectorAll("[data-save]"));
+    const characterSlot = document.querySelector("#characterSlot");
     const portraitPreview = document.querySelector("#portraitPreview");
-    const heroPreview = document.querySelector("#heroPreview");
+    const characterBodyPreview = document.querySelector("#characterBodyPreview");
+    const heroCostumePreview = document.querySelector("#heroCostumePreview");
     const parentOnePreview = document.querySelector("#parentOnePreview");
     const parentTwoPreview = document.querySelector("#parentTwoPreview");
     const health = document.querySelector("#health");
@@ -728,10 +823,28 @@
     const healthMeter = document.querySelector("#healthMeter");
     const radarShape = document.querySelector("#radarShape");
 
+    function cleanCharacterId(value) {
+      return String(value || "default").trim().toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "") || "default";
+    }
+    function storageKey(id) {
+      return `superhero-ttrpg-sheet-v2-${id}`;
+    }
+    function setCharacterSlot(id, updateAddress = true) {
+      characterId = cleanCharacterId(id);
+      storeKey = storageKey(characterId);
+      characterSlot.value = characterId;
+      if (updateAddress && window.location.protocol !== "file:") {
+        const nextUrl = new URL(window.location.href);
+        nextUrl.searchParams.set("character", characterId);
+        window.history.replaceState({}, "", nextUrl);
+      }
+    }
+
     function setImage(kind, dataUrl) {
       const images = {
         portrait: portraitPreview,
-        hero: heroPreview,
+        characterBody: characterBodyPreview,
+        heroCostume: heroCostumePreview,
         parentOne: parentOnePreview,
         parentTwo: parentTwoPreview
       };
@@ -767,8 +880,11 @@
     function collect() {
       const data = {};
       fields.forEach((field) => data[field.dataset.save] = field.value);
+      data.characterSlot = characterId;
+      data.savedAt = new Date().toISOString();
       data.portrait = portraitPreview.src.startsWith("data:") ? portraitPreview.src : "";
-      data.hero = heroPreview.src.startsWith("data:") ? heroPreview.src : "";
+      data.characterBody = characterBodyPreview.src.startsWith("data:") ? characterBodyPreview.src : "";
+      data.heroCostume = heroCostumePreview.src.startsWith("data:") ? heroCostumePreview.src : "";
       data.parentOne = parentOnePreview.src.startsWith("data:") ? parentOnePreview.src : "";
       data.parentTwo = parentTwoPreview.src.startsWith("data:") ? parentTwoPreview.src : "";
       return data;
@@ -776,7 +892,8 @@
     function apply(data) {
       fields.forEach((field) => field.value = data[field.dataset.save] ?? field.defaultValue ?? "");
       setImage("portrait", data.portrait || "");
-      setImage("hero", data.hero || "");
+      setImage("characterBody", data.characterBody || data.hero || "");
+      setImage("heroCostume", data.heroCostume || "");
       setImage("parentOne", data.parentOne || "");
       setImage("parentTwo", data.parentTwo || "");
       updateUi();
@@ -784,41 +901,65 @@
     function save() { localStorage.setItem(storeKey, JSON.stringify(collect())); }
     function load() {
       const raw = localStorage.getItem(storeKey);
-      if (raw) apply(JSON.parse(raw));
+      if (!raw) return false;
+      apply(JSON.parse(raw));
+      return true;
     }
-    function clearSheet() {
+    function resetSheet() {
       fields.forEach((field) => field.value = field.type === "range" ? "5" : field.defaultValue || "");
       setImage("portrait", "");
-      setImage("hero", "");
+      setImage("characterBody", "");
+      setImage("heroCostume", "");
       setImage("parentOne", "");
       setImage("parentTwo", "");
-      localStorage.removeItem(storeKey);
       updateUi();
+    }
+    function clearSheet() {
+      resetSheet();
+      localStorage.removeItem(storeKey);
+    }
+    function openCharacter() {
+      save();
+      setCharacterSlot(characterSlot.value);
+      if (!load()) resetSheet();
     }
     function exportData() {
       const blob = new Blob([JSON.stringify(collect(), null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "superhero-ttrpg-character-sheet.json";
+      const name = cleanCharacterId(document.querySelector("#heroName").value || document.querySelector("#characterName").value || characterId);
+      a.download = `${name}-character-sheet.json`;
       a.click();
       URL.revokeObjectURL(url);
     }
 
+    setCharacterSlot(characterId, false);
+    characterSlot.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") openCharacter();
+    });
+    document.querySelector("#openCharacterBtn").addEventListener("click", openCharacter);
     document.querySelector("#saveBtn").addEventListener("click", save);
     document.querySelector("#loadBtn").addEventListener("click", load);
     document.querySelector("#clearBtn").addEventListener("click", clearSheet);
     document.querySelector("#exportBtn").addEventListener("click", exportData);
     document.querySelector("#printBtn").addEventListener("click", () => window.print());
     document.querySelector("#portraitInput").addEventListener("change", (event) => readImage(event.target.files[0], "portrait"));
-    document.querySelector("#heroInput").addEventListener("change", (event) => readImage(event.target.files[0], "hero"));
+    document.querySelector("#characterBodyInput").addEventListener("change", (event) => readImage(event.target.files[0], "characterBody"));
+    document.querySelector("#heroCostumeInput").addEventListener("change", (event) => readImage(event.target.files[0], "heroCostume"));
     document.querySelector("#parentOneInput").addEventListener("change", (event) => readImage(event.target.files[0], "parentOne"));
     document.querySelector("#parentTwoInput").addEventListener("change", (event) => readImage(event.target.files[0], "parentTwo"));
     document.querySelector("#importFile").addEventListener("change", (event) => {
       const [file] = event.target.files;
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = () => { apply(JSON.parse(reader.result)); save(); event.target.value = ""; };
+      reader.onload = () => {
+        const data = JSON.parse(reader.result);
+        if (data.characterSlot) setCharacterSlot(data.characterSlot);
+        apply(data);
+        save();
+        event.target.value = "";
+      };
       reader.readAsText(file);
     });
     fields.forEach((field) => field.addEventListener("input", () => { updateUi(); save(); }));
