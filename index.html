@@ -103,18 +103,6 @@
       border: 0;
       box-shadow: none;
     }
-    .export-picker select {
-      min-width: 112px;
-      border: 0;
-      border-left: 3px solid var(--ink);
-      padding: 0 8px;
-      background: white;
-      color: var(--ink);
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: .9rem;
-      font-weight: 900;
-      text-transform: uppercase;
-    }
     .page {
       width: min(1260px, 100%);
       margin: 0 auto;
@@ -671,14 +659,7 @@
     <button id="loadBtn" type="button">Load</button>
     <button id="clearBtn" type="button">Clear</button>
     <div class="export-picker">
-      <button id="exportRunBtn" type="button" onclick="runExport()">Export</button>
-      <select id="exportChoice">
-        <option value="html">HTML</option>
-        <option value="pdf">PDF</option>
-        <option value="png">PNG</option>
-        <option value="obsidian">Obsidian .md</option>
-        <option value="json">Data</option>
-      </select>
+      <button id="exportPngBtn" type="button" onclick="exportPng()">Export PNG</button>
     </div>
     <label>Import<input id="importFile" type="file" accept="application/json"></label>
   </nav>
@@ -1146,19 +1127,6 @@ Open this note in reading view to use the interactive sheet.
         exportSvgFallback();
       }
     }
-    function runExport() {
-      try {
-        const choice = document.querySelector("#exportChoice").value;
-        if (choice === "html") exportHtml();
-        if (choice === "pdf") window.print();
-        if (choice === "png") exportPng();
-        if (choice === "obsidian") exportObsidian();
-        if (choice === "json") exportData();
-      } catch (error) {
-        console.error(error);
-        alert("Export could not start. Try choosing HTML or Data, then press Export again.");
-      }
-    }
     function loadEmbeddedCharacter() {
       const match = window.location.hash.match(/^#data=(.+)$/);
       if (!match) return false;
@@ -1182,9 +1150,6 @@ Open this note in reading view to use the interactive sheet.
     document.querySelector("#saveBtn").addEventListener("click", save);
     document.querySelector("#loadBtn").addEventListener("click", load);
     document.querySelector("#clearBtn").addEventListener("click", clearSheet);
-    document.querySelector("#exportChoice").addEventListener("keydown", (event) => {
-      if (event.key === "Enter") runExport();
-    });
     document.querySelector("#portraitInput").addEventListener("change", (event) => readImage(event.target.files[0], "portrait"));
     document.querySelector("#characterBodyInput").addEventListener("change", (event) => readImage(event.target.files[0], "characterBody"));
     document.querySelector("#heroCostumeInput").addEventListener("change", (event) => readImage(event.target.files[0], "heroCostume"));
