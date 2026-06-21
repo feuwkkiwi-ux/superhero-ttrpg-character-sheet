@@ -438,6 +438,18 @@
       background: var(--pale);
       padding: 8px;
     }
+    .personality-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .personality-extra {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
     .parents-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -561,7 +573,7 @@
       .toolbar { justify-content: stretch; }
       .toolbar button, .toolbar label { flex: 1 1 auto; }
       .character-switcher { min-width: 100%; }
-      .row, .abilities, .health-controls, .bio-grid, .parents-grid, .cards, .rank-stack, .statistics-grid, .illustration-grid { grid-template-columns: 1fr; }
+      .row, .abilities, .health-controls, .bio-grid, .parents-grid, .personality-grid, .personality-extra, .cards, .rank-stack, .statistics-grid, .illustration-grid { grid-template-columns: 1fr; }
       .hero-art { min-height: 500px; }
       .stat-line { grid-template-columns: 90px 1fr 30px; }
     }
@@ -595,8 +607,11 @@
       .rank-stack {
         grid-template-columns: 1fr 1fr 1.4fr;
       }
-      .row, .bio-grid, .parents-grid, .illustration-grid {
+      .row, .bio-grid, .parents-grid, .personality-extra, .illustration-grid {
         grid-template-columns: repeat(2, 1fr);
+      }
+      .personality-grid {
+        grid-template-columns: repeat(3, 1fr);
       }
       .abilities {
         grid-template-columns: repeat(2, 1fr);
@@ -711,6 +726,7 @@
               <button type="button" data-dice="10">d10</button>
               <button type="button" data-dice="12">d12</button>
               <button type="button" data-dice="20">d20</button>
+              <button type="button" data-dice="100">d100</button>
               <output id="diceResult" class="dice-result">Roll</output>
             </div>
           </div>
@@ -797,7 +813,18 @@
               </div>
             </div>
           </div>
-          <div class="panel"><span class="panel-title">Traits & Tags</span><textarea id="traits" data-save="traits" class="tall" placeholder="Battle ready, alien heritage, public identity, mentor, rival..."></textarea></div>
+          <div class="panel">
+            <span class="panel-title">Personality</span>
+            <div class="personality-grid">
+              <div class="field"><label for="personalityOne">Personality 1</label><input id="personalityOne" data-save="personalityOne" type="text"></div>
+              <div class="field"><label for="personalityTwo">Personality 2</label><input id="personalityTwo" data-save="personalityTwo" type="text"></div>
+              <div class="field"><label for="personalityThree">Personality 3</label><input id="personalityThree" data-save="personalityThree" type="text"></div>
+            </div>
+            <div class="personality-extra">
+              <div class="field"><label for="ideals">Ideals</label><input id="ideals" data-save="ideals" type="text"></div>
+              <div class="field"><label for="idol">Idol</label><input id="idol" data-save="idol" type="text"></div>
+            </div>
+          </div>
         </section>
       </div>
       <div class="cards">
