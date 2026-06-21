@@ -152,7 +152,7 @@
     }
     .top {
       display: grid;
-      grid-template-columns: 300px 1fr 220px;
+      grid-template-columns: 300px 1fr;
       gap: 18px;
       margin-bottom: 18px;
       align-items: stretch;
@@ -218,13 +218,15 @@
       line-height: .9;
       font-size: clamp(2.2rem, 5vw, 4.4rem);
     }
-    .rank-stack { display: grid; gap: 12px; }
+    .rank-stack { display: grid; gap: 12px; align-content: stretch; }
     .rank-card {
-      min-height: 86px;
+      min-height: 112px;
       padding: 8px;
       text-align: center;
       border-color: var(--red);
       background: linear-gradient(135deg, white 0 72%, #fae9e9 72%);
+      display: grid;
+      align-content: center;
     }
     .rank-card label {
       display: block;
@@ -624,7 +626,7 @@
         border-width: 1.4mm;
       }
       .top {
-        grid-template-columns: 72mm 1fr 52mm;
+        grid-template-columns: 72mm 1fr;
       }
       .grid {
         grid-template-columns: .92fr 1.08fr;
@@ -668,16 +670,6 @@
     <section class="sheet">
       <div class="stripe"><span>/8/ Characters</span><span>Hero Academy Dossier</span></div>
       <header class="top">
-        <label class="photo" for="portraitInput">
-          <img id="portraitPreview" alt="">
-          <span class="drop">Profile<br>Photo</span>
-        </label>
-        <div class="identity">
-          <div class="badge">Northern Academy<br>Superhero Program</div>
-          <h1>Hero Course File</h1>
-          <div class="field"><label for="characterName">Character Name</label><input id="characterName" data-save="characterName" type="text"></div>
-          <div class="field"><label for="heroName">Hero Name</label><input id="heroName" data-save="heroName" type="text"></div>
-        </div>
         <div class="rank-stack">
           <div class="rank-card"><label for="rank">Rank</label><input id="rank" data-save="rank" type="number" min="1" max="20" value="1"></div>
           <div class="rank-card"><label for="karma">Karma</label><input id="karma" data-save="karma" type="number" min="0" value="0"></div>
@@ -688,6 +680,12 @@
               <span>Fly (ft)<input id="flySpeed" data-save="flySpeed" type="number" value="0"></span>
             </div>
           </div>
+        </div>
+        <div class="identity">
+          <div class="badge">Northern Academy<br>Superhero Program</div>
+          <h1>Hero Course File</h1>
+          <div class="field"><label for="characterName">Character Name</label><input id="characterName" data-save="characterName" type="text"></div>
+          <div class="field"><label for="heroName">Hero Name</label><input id="heroName" data-save="heroName" type="text"></div>
         </div>
       </header>
 
@@ -856,7 +854,6 @@
     </section>
   </main>
 
-  <input class="hidden-file" id="portraitInput" type="file" accept="image/*">
   <input class="hidden-file" id="characterBodyInput" type="file" accept="image/*">
   <input class="hidden-file" id="heroCostumeInput" type="file" accept="image/*">
   <input class="hidden-file" id="parentOneInput" type="file" accept="image/*">
@@ -868,7 +865,6 @@
     let storeKey = storageKey(characterId);
     const fields = Array.from(document.querySelectorAll("[data-save]"));
     const characterSlot = document.querySelector("#characterSlot");
-    const portraitPreview = document.querySelector("#portraitPreview");
     const characterBodyPreview = document.querySelector("#characterBodyPreview");
     const heroCostumePreview = document.querySelector("#heroCostumePreview");
     const parentOnePreview = document.querySelector("#parentOnePreview");
@@ -899,7 +895,6 @@
 
     function setImage(kind, dataUrl) {
       const images = {
-        portrait: portraitPreview,
         characterBody: characterBodyPreview,
         heroCostume: heroCostumePreview,
         parentOne: parentOnePreview,
@@ -939,7 +934,6 @@
       fields.forEach((field) => data[field.dataset.save] = field.value);
       data.characterSlot = characterId;
       data.savedAt = new Date().toISOString();
-      data.portrait = portraitPreview.src.startsWith("data:") ? portraitPreview.src : "";
       data.characterBody = characterBodyPreview.src.startsWith("data:") ? characterBodyPreview.src : "";
       data.heroCostume = heroCostumePreview.src.startsWith("data:") ? heroCostumePreview.src : "";
       data.parentOne = parentOnePreview.src.startsWith("data:") ? parentOnePreview.src : "";
@@ -954,7 +948,6 @@
     }
     function apply(data) {
       fields.forEach((field) => field.value = data[field.dataset.save] ?? field.defaultValue ?? "");
-      setImage("portrait", data.portrait || "");
       setImage("characterBody", data.characterBody || data.hero || "");
       setImage("heroCostume", data.heroCostume || "");
       setImage("parentOne", data.parentOne || "");
@@ -970,7 +963,6 @@
     }
     function resetSheet() {
       fields.forEach((field) => field.value = field.type === "range" ? "5" : field.defaultValue || "");
-      setImage("portrait", "");
       setImage("characterBody", "");
       setImage("heroCostume", "");
       setImage("parentOne", "");
@@ -1150,7 +1142,6 @@ Open this note in reading view to use the interactive sheet.
     document.querySelector("#saveBtn").addEventListener("click", save);
     document.querySelector("#loadBtn").addEventListener("click", load);
     document.querySelector("#clearBtn").addEventListener("click", clearSheet);
-    document.querySelector("#portraitInput").addEventListener("change", (event) => readImage(event.target.files[0], "portrait"));
     document.querySelector("#characterBodyInput").addEventListener("change", (event) => readImage(event.target.files[0], "characterBody"));
     document.querySelector("#heroCostumeInput").addEventListener("change", (event) => readImage(event.target.files[0], "heroCostume"));
     document.querySelector("#parentOneInput").addEventListener("change", (event) => readImage(event.target.files[0], "parentOne"));
