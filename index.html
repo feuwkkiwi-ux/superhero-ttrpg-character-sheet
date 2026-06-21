@@ -99,7 +99,7 @@
       background: var(--yellow);
       box-shadow: 3px 3px 0 var(--ink);
     }
-    .export-picker label {
+    .export-picker button {
       border: 0;
       box-shadow: none;
     }
@@ -670,11 +670,11 @@
     <button id="loadBtn" type="button">Load</button>
     <button id="clearBtn" type="button">Clear</button>
     <div class="export-picker">
-      <label for="exportChoice">Export</label>
+      <button id="exportRunBtn" type="button">Export</button>
       <select id="exportChoice">
         <option value="html">HTML</option>
         <option value="pdf">PDF</option>
-        <option value="obsidian">Obsidian</option>
+        <option value="obsidian">Obsidian .md</option>
         <option value="json">Data</option>
       </select>
     </div>
@@ -1070,7 +1070,7 @@ Open this note in reading view to use the interactive sheet.
     document.querySelector("#saveBtn").addEventListener("click", save);
     document.querySelector("#loadBtn").addEventListener("click", load);
     document.querySelector("#clearBtn").addEventListener("click", clearSheet);
-    document.querySelector(".export-picker label").addEventListener("click", runExport);
+    document.querySelector("#exportRunBtn").addEventListener("click", runExport);
     document.querySelector("#exportChoice").addEventListener("keydown", (event) => {
       if (event.key === "Enter") runExport();
     });
