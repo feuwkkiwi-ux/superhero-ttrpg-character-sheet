@@ -236,8 +236,10 @@
       display: grid;
       grid-template-columns: .92fr 1.08fr;
       gap: 18px;
+      align-items: stretch;
     }
     .left, .right { display: flex; flex-direction: column; gap: 14px; }
+    .right { justify-content: space-between; }
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .field {
       display: grid;
@@ -440,13 +442,17 @@
     }
     .personality-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
       margin-top: 10px;
+    }
+    .personality-grid textarea {
+      min-height: 135px;
+      border: 3px solid var(--line);
+      background: var(--pale);
+      padding: 8px;
     }
     .personality-extra {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
       margin-top: 10px;
     }
@@ -573,7 +579,7 @@
       .toolbar { justify-content: stretch; }
       .toolbar button, .toolbar label { flex: 1 1 auto; }
       .character-switcher { min-width: 100%; }
-      .row, .abilities, .health-controls, .bio-grid, .parents-grid, .personality-grid, .personality-extra, .cards, .rank-stack, .statistics-grid, .illustration-grid { grid-template-columns: 1fr; }
+      .row, .abilities, .health-controls, .bio-grid, .parents-grid, .personality-extra, .cards, .rank-stack, .statistics-grid, .illustration-grid { grid-template-columns: 1fr; }
       .hero-art { min-height: 500px; }
       .stat-line { grid-template-columns: 90px 1fr 30px; }
     }
@@ -607,10 +613,10 @@
       .rank-stack {
         grid-template-columns: 1fr 1fr 1.4fr;
       }
-      .row, .bio-grid, .parents-grid, .personality-extra, .illustration-grid {
+      .row, .bio-grid, .parents-grid, .illustration-grid {
         grid-template-columns: repeat(2, 1fr);
       }
-      .personality-grid {
+      .personality-extra {
         grid-template-columns: repeat(3, 1fr);
       }
       .abilities {
@@ -816,13 +822,15 @@
           <div class="panel">
             <span class="panel-title">Personality</span>
             <div class="personality-grid">
-              <div class="field"><label for="personalityOne">Personality 1</label><input id="personalityOne" data-save="personalityOne" type="text"></div>
-              <div class="field"><label for="personalityTwo">Personality 2</label><input id="personalityTwo" data-save="personalityTwo" type="text"></div>
-              <div class="field"><label for="personalityThree">Personality 3</label><input id="personalityThree" data-save="personalityThree" type="text"></div>
+              <div class="description-box">
+                <label for="personality">Personality</label>
+                <textarea id="personality" data-save="personality" placeholder="Write three personality traits..."></textarea>
+              </div>
             </div>
             <div class="personality-extra">
               <div class="field"><label for="ideals">Ideals</label><input id="ideals" data-save="ideals" type="text"></div>
               <div class="field"><label for="idol">Idol</label><input id="idol" data-save="idol" type="text"></div>
+              <div class="field"><label for="flaw">Flaw</label><input id="flaw" data-save="flaw" type="text"></div>
             </div>
           </div>
         </section>
