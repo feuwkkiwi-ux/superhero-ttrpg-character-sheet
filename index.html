@@ -670,7 +670,7 @@
     <button id="loadBtn" type="button">Load</button>
     <button id="clearBtn" type="button">Clear</button>
     <div class="export-picker">
-      <button id="exportRunBtn" type="button">Export</button>
+      <button id="exportRunBtn" type="button" onclick="runExport()">Export</button>
       <select id="exportChoice">
         <option value="html">HTML</option>
         <option value="pdf">PDF</option>
@@ -1011,11 +1011,17 @@
     function downloadTextFile(filename, content, type) {
       const blob = new Blob([content], { type });
       const url = URL.createObjectURL(blob);
+      downloadUrl(filename, url);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+    function downloadUrl(filename, url) {
       const a = document.createElement("a");
       a.href = url;
       a.download = filename;
+      a.style.display = "none";
+      document.body.appendChild(a);
       a.click();
-      URL.revokeObjectURL(url);
+      a.remove();
     }
     function exportData() {
       downloadTextFile(characterFileName("json"), JSON.stringify(collect(), null, 2), "application/json");
@@ -1097,18 +1103,21 @@ Open this note in reading view to use the interactive sheet.
       const image = new Image();
       const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }));
       image.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const context = canvas.getContext("2d");
-        context.fillStyle = "#ffffff";
-        context.fillRect(0, 0, width, height);
-        context.drawImage(image, 0, 0);
-        URL.revokeObjectURL(url);
-        const a = document.createElement("a");
-        a.href = canvas.toDataURL("image/png");
-        a.download = characterFileName("png");
-        a.click();
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const context = canvas.getContext("2d");
+          context.fillStyle = "#ffffff";
+          context.fillRect(0, 0, width, height);
+          context.drawImage(image, 0, 0);
+          downloadUrl(characterFileName("png"), canvas.toDataURL("image/png"));
+        } catch (error) {
+          alert("PNG export was blocked by this browser. I will download an SVG image instead.");
+          downloadTextFile(characterFileName("svg"), svg, "image/svg+xml");
+        } finally {
+          URL.revokeObjectURL(url);
+        }
       };
       image.onerror = () => {
         URL.revokeObjectURL(url);
@@ -1117,12 +1126,17 @@ Open this note in reading view to use the interactive sheet.
       image.src = url;
     }
     function runExport() {
-      const choice = document.querySelector("#exportChoice").value;
-      if (choice === "html") exportHtml();
-      if (choice === "pdf") window.print();
-      if (choice === "png") exportPng();
-      if (choice === "obsidian") exportObsidian();
-      if (choice === "json") exportData();
+      try {
+        const choice = document.querySelector("#exportChoice").value;
+        if (choice === "html") exportHtml();
+        if (choice === "pdf") window.print();
+        if (choice === "png") exportPng();
+        if (choice === "obsidian") exportObsidian();
+        if (choice === "json") exportData();
+      } catch (error) {
+        console.error(error);
+        alert("Export could not start. Try choosing HTML or Data, then press Export again.");
+      }
     }
     function loadEmbeddedCharacter() {
       const match = window.location.hash.match(/^#data=(.+)$/);
@@ -1147,7 +1161,6 @@ Open this note in reading view to use the interactive sheet.
     document.querySelector("#saveBtn").addEventListener("click", save);
     document.querySelector("#loadBtn").addEventListener("click", load);
     document.querySelector("#clearBtn").addEventListener("click", clearSheet);
-    document.querySelector("#exportRunBtn").addEventListener("click", runExport);
     document.querySelector("#exportChoice").addEventListener("keydown", (event) => {
       if (event.key === "Enter") runExport();
     });
