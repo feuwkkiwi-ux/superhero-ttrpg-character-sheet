@@ -674,6 +674,7 @@
       <select id="exportChoice">
         <option value="html">HTML</option>
         <option value="pdf">PDF</option>
+        <option value="obsidian">Obsidian</option>
         <option value="json">Data</option>
       </select>
     </div>
@@ -996,19 +997,23 @@
       setCharacterSlot(characterSlot.value);
       if (!load()) resetSheet();
     }
-    function exportData() {
-      const blob = new Blob([JSON.stringify(collect(), null, 2)], { type: "application/json" });
+    function characterFileName(extension) {
+      const name = cleanCharacterId(document.querySelector("#heroName").value || document.querySelector("#characterName").value || characterId);
+      return `${name}-character-sheet.${extension}`;
+    }
+    function downloadTextFile(filename, content, type) {
+      const blob = new Blob([content], { type });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      const name = cleanCharacterId(document.querySelector("#heroName").value || document.querySelector("#characterName").value || characterId);
-      a.download = `${name}-character-sheet.json`;
+      a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
     }
-    function exportHtml() {
-      const data = collect();
-      const name = cleanCharacterId(document.querySelector("#heroName").value || document.querySelector("#characterName").value || characterId);
+    function exportData() {
+      downloadTextFile(characterFileName("json"), JSON.stringify(collect(), null, 2), "application/json");
+    }
+    function buildStandaloneHtml(data) {
       const exportScript = `
   <script data-exported-character>
     window.addEventListener("load", () => {
@@ -1018,21 +1023,31 @@
       if (window.save) save();
     });
   <\/script>`;
-      const html = "<!doctype html>\n" + document.documentElement.outerHTML
+      return "<!doctype html>\n" + document.documentElement.outerHTML
         .replace(/\n\s*<script data-exported-character>[\s\S]*?<\/script>/g, "")
         .replace("</body>", `${exportScript}\n</body>`);
-      const blob = new Blob([html], { type: "text/html" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${name}-character-sheet.html`;
-      a.click();
-      URL.revokeObjectURL(url);
+    }
+    function exportHtml() {
+      downloadTextFile(characterFileName("html"), buildStandaloneHtml(collect()), "text/html");
+    }
+    function exportObsidian() {
+      const htmlName = characterFileName("html");
+      const noteName = characterFileName("md");
+      const title = document.querySelector("#heroName").value || document.querySelector("#characterName").value || characterId;
+      const note = `# ${title} Character Sheet
+
+<iframe src="./${htmlName}" width="100%" height="1200" style="border:0;"></iframe>
+
+Keep this note in the same Obsidian folder as \`${htmlName}\`.
+`;
+      downloadTextFile(htmlName, buildStandaloneHtml(collect()), "text/html");
+      setTimeout(() => downloadTextFile(noteName, note, "text/markdown"), 250);
     }
     function runExport() {
       const choice = document.querySelector("#exportChoice").value;
       if (choice === "html") exportHtml();
       if (choice === "pdf") window.print();
+      if (choice === "obsidian") exportObsidian();
       if (choice === "json") exportData();
     }
 
