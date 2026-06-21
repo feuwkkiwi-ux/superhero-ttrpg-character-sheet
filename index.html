@@ -661,6 +661,7 @@
       }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
   <nav class="toolbar" aria-label="Sheet tools">
@@ -1083,7 +1084,7 @@ Open this note in reading view to use the interactive sheet.
         if (copy.tagName === "INPUT") copy.setAttribute("value", field.value);
       });
     }
-    function exportPng() {
+    function exportSvgFallback() {
       const sheet = document.querySelector(".sheet");
       const clone = sheet.cloneNode(true);
       copyFormValues(sheet, clone);
@@ -1121,9 +1122,29 @@ Open this note in reading view to use the interactive sheet.
       };
       image.onerror = () => {
         URL.revokeObjectURL(url);
-        alert("PNG export could not render in this browser. Try HTML or PDF instead.");
+        alert("Image export could not render in this browser. Try HTML or PDF instead.");
       };
       image.src = url;
+    }
+    async function exportPng() {
+      const sheet = document.querySelector(".sheet");
+      if (!window.html2canvas) {
+        alert("PNG helper could not load. I will download an SVG image instead.");
+        exportSvgFallback();
+        return;
+      }
+      try {
+        const canvas = await html2canvas(sheet, {
+          backgroundColor: "#ffffff",
+          scale: 2,
+          useCORS: true
+        });
+        downloadUrl(characterFileName("png"), canvas.toDataURL("image/png"));
+      } catch (error) {
+        console.error(error);
+        alert("PNG export was blocked by this browser. I will download an SVG image instead.");
+        exportSvgFallback();
+      }
     }
     function runExport() {
       try {
